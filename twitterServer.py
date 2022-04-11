@@ -25,17 +25,31 @@ class TweetsListener(tweepy.Stream):
 
     
     # we override the on_data() function in StreamListener
+    
     def on_data(self, data):
         try:
             msg = json.loads( data )
             #print(msg['text'].encode('utf-8'))
+            test_list=['football','music']
+            topic=[ele for ele in test_list if(ele in msg['text'])]
+            if(len(topic)):
+                topic1=topic[0]
+            else:
+                return True
+            #val={"topic":topic1,"tweet":msg["text"]}
+            #jsonval=json.dumps(val)
             #self.db.stream.insert_one(msg)
             #producer.send(topic_name, msg['text'].encode('utf-8'))
+            #msg['text'].append(topic)      
             c_socket.send( msg['text'].encode('utf-8'))
             return True
         except BaseException as e:
             print("Error on_data: %s" % str(e))
             return True
+
+    def on_matching_rules(self,matching_rules):
+        print(matching_rules)
+
 
     def if_error(self, status):
         print(status)
@@ -44,20 +58,23 @@ class TweetsListener(tweepy.Stream):
 
 def send_tweets():
     stream_listener = TweetsListener(consumer_key, consumer_secret, access_token, access_secret)
-    stream_listener.filter(track=['football'])
+    stream_listener.filter(track=['#music'],languages=["en"])
+    #stream_listener.filter(track=['music'])
 
 
 if __name__ == "__main__":
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)         # Create a socket object
     host = "127.0.0.1"     # Get local machine name
-    port = 5556                 # Reserve a port for your service.
+    port = 5556        # Reserve a port for your service.
     s.bind((host, port))        # Bind to the port
     
     print("Listening on port: %s" % str(port))
     s.listen(5)                 # Now wait for client connection.
     c, addr = s.accept()        # Establish connection with client.
     print("Received request from: " + str(addr))
-    print(c)
+    #print(c)
     c_socket=c
     send_tweets()
+
+
