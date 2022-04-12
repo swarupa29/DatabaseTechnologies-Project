@@ -30,7 +30,7 @@ class TweetsListener(tweepy.Stream):
         try:
             msg = json.loads( data )
             #print(msg['text'].encode('utf-8'))
-            test_list=['football','music']
+            test_list=['#ipl','#music']
             topic=[ele for ele in test_list if(ele in msg['text'])]
             if(len(topic)):
                 topic1=topic[0]
@@ -58,7 +58,7 @@ class TweetsListener(tweepy.Stream):
 
 def send_tweets():
     stream_listener = TweetsListener(consumer_key, consumer_secret, access_token, access_secret)
-    stream_listener.filter(track=['#music'],languages=["en"])
+    stream_listener.filter(track=['#music','#ipl'],languages=["en"])
     #stream_listener.filter(track=['music'])
 
 
