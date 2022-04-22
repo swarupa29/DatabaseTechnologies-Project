@@ -47,10 +47,7 @@ class TweetsListener(tweepy.Stream):
             print("Error on_data: %s" % str(e))
             return True
 
-    def on_matching_rules(self,matching_rules):
-        print(matching_rules)
-
-
+    
     def if_error(self, status):
         print(status)
         return True
@@ -66,7 +63,7 @@ if __name__ == "__main__":
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)         # Create a socket object
     host = "127.0.0.1"     # Get local machine name
-    port = 5556        # Reserve a port for your service.
+    port = 5555        # Reserve a port for your service.
     s.bind((host, port))        # Bind to the port
     
     print("Listening on port: %s" % str(port))
