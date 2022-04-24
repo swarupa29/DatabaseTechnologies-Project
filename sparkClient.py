@@ -29,10 +29,10 @@ def send_kafka(res):
 sc = SparkContext()
 spark = SparkSession(sc)
 # we initiate the StreamingContext with 100 second batch interval. #next we initiate our sqlcontext
-ssc = StreamingContext(sc, 30)
+ssc = StreamingContext(sc, 20)
 
 socket_stream = ssc.socketTextStream("127.0.0.1", 5555)
-lines = socket_stream.window( 30,30 )
+lines = socket_stream.window( 20 )
 
 #ENTER THE LOGIC FOR GETTING COUNTS OF TWEETS HERE
 
@@ -65,7 +65,7 @@ map2 = filter2.map( lambda line: ( 'ipl', 1 ) )
 mapreduce2 = map2.reduceByKey( lambda a, b: a + b )
 #final=mapreduce2.map(lambda a: json.dumps(a))
 repartitioned2 = mapreduce2.repartition(1)
-repartitioned2.foreachRDD(savetheresult)
+#repartitioned2.foreachRDD(savetheresult)
 
 
 

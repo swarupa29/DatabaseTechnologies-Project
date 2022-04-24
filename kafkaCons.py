@@ -14,10 +14,11 @@ def insert_into_postgres(sql_string):
             dbname="kafka_data",
             user="postgres",
             host="localhost",
-            password="putyours",
+            password="root",
             port=5432,
             # attempt to connect for 3 seconds then raise exception
-            connect_timeout=3
+            connect_timeout=6
+
         )
 
         cur = conn.cursor()
@@ -50,10 +51,12 @@ consumer = kafka.KafkaConsumer(
 print("here1")
 for message in consumer:
     message = message.value
-    jsonobj = json.parse(message)
     print(message)
-    print(jsonobj)
+    #val=json.loads(message)
+    data=[json.loads(line) for line in message]
+    #jsonobj = json.loads(data[-1])
+    print(data)
     # data ="{"topic":"music","count":"1"}"
-    sql_string = 'INSERT INTO kafka_data(topic_name,count) VALUES(' + \
-        jsonobj.topic+','+jsonobj.count+');'
+    sql_string = 'INSERT INTO kafka_stream VALUES("' + \
+        str(jsonobj['topic'])+'",'+str(jsonobj['score'])+');'
     insert_into_postgres(sql_string)

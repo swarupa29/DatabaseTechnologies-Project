@@ -23,8 +23,7 @@ while True:
         if len(msg) <= 0:
             break
         data += msg.decode("utf-8") 
-        jsonval=json.loads(data)
-        print(jsonval)
+        print(data)
         producer.send('music', value=data)
 
 
