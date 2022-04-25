@@ -41,14 +41,41 @@ def insert_into_postgres(sql_string):
         cur.close()
         conn.close()
 
-
 consumer = kafka.KafkaConsumer(
-    ['music','ipl','elections','bts','kgf'],
     bootstrap_servers=['localhost:9092'],
     auto_offset_reset='earliest',
     enable_auto_commit=True,
     group_id='my-group',
     value_deserializer=lambda x: loads(x.decode('utf-8')))
+consumer.subscribe(["music","ipl","kgf","bts","elections"])
+'''    
+consumer2 = kafka.KafkaConsumer(
+    'bts',
+    bootstrap_servers=['localhost:9092'],
+    auto_offset_reset='earliest',
+    enable_auto_commit=True,
+    group_id='my-group',
+    value_deserializer=lambda x: loads(x.decode('utf-8')))
+consumer3 = kafka.KafkaConsumer(
+    'kgf',
+    bootstrap_servers=['localhost:9092'],
+    auto_offset_reset='earliest',
+    enable_auto_commit=True,
+    group_id='my-group',
+    value_deserializer=lambda x: loads(x.decode('utf-8')))
+consumer4 = kafka.KafkaConsumer(
+    'elections',
+    bootstrap_servers=['localhost:9092'],
+    auto_offset_reset='earliest',
+    enable_auto_commit=True,
+    group_id='my-group',
+    value_deserializer=lambda x: loads(x.decode('utf-8')))
+
+'''
+
+
+
+
 print("here1")
 for message in consumer:
     message = message.value
@@ -58,6 +85,10 @@ for message in consumer:
     jsonobj = json.loads(val)
     # data ="{"topic":"music","count":"1"}"
     sql_string = 'INSERT INTO kafka_stream(topic_name,count) VALUES(\'' + \
-        str(jsonobj['topic'])+'\','+str(jsonobj['score'])+');'
+        str(jsonobj['topic'])+'\','+str(jsonobj['count'])+');'
     insert_into_postgres(sql_string)
     continue
+
+
+
+

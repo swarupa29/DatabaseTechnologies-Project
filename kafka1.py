@@ -20,13 +20,15 @@ while True:
         data=''
         msg = s.recv(1024)
         print("here3")
-        print(msg)
         if len(msg) <= 0:
             break
         data += msg.decode("utf-8") 
-        print(data)
         val=json.loads(json.loads(data))
-        producer.send(val['topic'], value=data)
+        print(data)
+        print(val)
+        print(val['topic'])
+        topic=val['topic'].replace('#','')
+        producer.send(topic, value=data)
         
 
 
