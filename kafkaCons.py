@@ -33,6 +33,7 @@ def insert_into_postgres(sql_string):
             cur.execute(sql_string)
             conn.commit()
             print('\nfinished inserting!')
+            return
         except (Exception, Error) as error:
             print("\nexecute_sql() error:", error)
             conn.rollback()
@@ -42,7 +43,7 @@ def insert_into_postgres(sql_string):
 
 
 consumer = kafka.KafkaConsumer(
-    'music',
+    ['music','ipl','elections','bts','kgf'],
     bootstrap_servers=['localhost:9092'],
     auto_offset_reset='earliest',
     enable_auto_commit=True,
@@ -52,11 +53,11 @@ print("here1")
 for message in consumer:
     message = message.value
     print(message)
-    #val=json.loads(message)
-    data=[json.loads(line) for line in message]
-    #jsonobj = json.loads(data[-1])
-    print(data)
+    val=json.loads(message)
+    #data=[json.loads(line) for line in message]
+    jsonobj = json.loads(val)
     # data ="{"topic":"music","count":"1"}"
-    sql_string = 'INSERT INTO kafka_stream VALUES("' + \
-        str(jsonobj['topic'])+'",'+str(jsonobj['score'])+');'
+    sql_string = 'INSERT INTO kafka_stream(topic_name,count) VALUES(\'' + \
+        str(jsonobj['topic'])+'\','+str(jsonobj['score'])+');'
     insert_into_postgres(sql_string)
+    continue

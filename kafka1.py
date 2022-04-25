@@ -6,7 +6,7 @@ from json import loads
 import json
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("127.0.0.1", 5557))
+s.connect(("127.0.0.1", 5558))
 
 
 producer = kafka.KafkaProducer(bootstrap_servers=['localhost:9092'],
@@ -17,6 +17,7 @@ while True:
     print("here2")
     data = ''
     while True:
+        data=''
         msg = s.recv(1024)
         print("here3")
         print(msg)
@@ -24,7 +25,10 @@ while True:
             break
         data += msg.decode("utf-8") 
         print(data)
-        producer.send('music', value=data)
+        val=json.loads(json.loads(data))
+        producer.send(val['topic'], value=data)
+        
+
 
 
     print("data len and data")

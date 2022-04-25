@@ -30,7 +30,7 @@ class TweetsListener(tweepy.Stream):
         try:
             msg = json.loads( data )
             #print(msg['text'].encode('utf-8'))
-            test_list=['#ipl','#music']
+            test_list=['#music','#ipl','#kgf','#bts','#elections']
             topic=[ele for ele in test_list if(ele in msg['text'])]
             if(len(topic)):
                 topic1=topic[0]
@@ -55,7 +55,7 @@ class TweetsListener(tweepy.Stream):
 
 def send_tweets():
     stream_listener = TweetsListener(consumer_key, consumer_secret, access_token, access_secret)
-    stream_listener.filter(track=['#music','#ipl'],languages=["en"])
+    stream_listener.filter(track=['#music','#ipl','#kgf','#bts','#elections'],languages=["en"])
     #stream_listener.filter(track=['music'])
 
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)         # Create a socket object
     host = "127.0.0.1"     # Get local machine name
-    port = 5555        # Reserve a port for your service.
+    port = 5556        # Reserve a port for your service.
     s.bind((host, port))        # Bind to the port
     
     print("Listening on port: %s" % str(port))

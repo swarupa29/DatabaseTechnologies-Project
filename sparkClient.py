@@ -13,7 +13,7 @@ from pyspark.sql.functions import desc
 def savetheresult( rdd ):
     if not rdd.isEmpty():
         print("in save")
-        res=rdd.toDF( [ "topic", "score" ] ).toJSON().first()
+        res=rdd.toDF( [ "topic", "count" ] ).toJSON().first()
         print( res)
         send_kafka(res)
 
@@ -31,14 +31,14 @@ spark = SparkSession(sc)
 # we initiate the StreamingContext with 100 second batch interval. #next we initiate our sqlcontext
 ssc = StreamingContext(sc, 20)
 
-socket_stream = ssc.socketTextStream("127.0.0.1", 5555)
+socket_stream = ssc.socketTextStream("127.0.0.1", 5556)
 lines = socket_stream.window( 20 )
 
 #ENTER THE LOGIC FOR GETTING COUNTS OF TWEETS HERE
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)         # Create a socket object
 host = "127.0.0.1"     # Get local machine name
-port = 5557        # Reserve a port for your service.
+port = 5558        # Reserve a port for your service.
 s.bind((host, port))        # Bind to the port
     
 print("Listening on port: %s" % str(port))
@@ -51,23 +51,48 @@ c_socket=c
 
 
 
-#get tweets with music
-filter1=lines.filter(lambda line: line if "#music" in line.lower() else None)
-map = filter1.map( lambda line: ( 'music', 1)  )
-mapreduce = map.reduceByKey( lambda a, b: a + b )
-#final1=mapreduce.map(lambda a: json.dumps(a))
-repartitioned = mapreduce.repartition(1)
-repartitioned.foreachRDD(savetheresult)
+
+
+def get_tweets(lines,topic):
+    #get tweets with music
+    filter1=lines.filter(lambda line: line if topic in line.lower() else None)
+    map = filter1.map( lambda line: ( topic, 1)  )
+    mapreduce = map.reduceByKey( lambda a, b: a + b )
+    #final1=mapreduce.map(lambda a: json.dumps(a))
+    repartitioned = mapreduce.repartition(1)
+    repartitioned.foreachRDD(savetheresult)
+
+
+
+get_tweets(lines,'#music')
+get_tweets(lines,'#ipl')
+get_tweets(lines,'#bts')
+get_tweets(lines,'#elections')
+get_tweets(lines,'#kgf')
+
+
+
+
+
 
 #get tweets with ipl
+'''
 filter2=lines.filter(lambda line: line if "#ipl" in line.lower() else None)
 map2 = filter2.map( lambda line: ( 'ipl', 1 ) )
 mapreduce2 = map2.reduceByKey( lambda a, b: a + b )
 #final=mapreduce2.map(lambda a: json.dumps(a))
 repartitioned2 = mapreduce2.repartition(1)
-#repartitioned2.foreachRDD(savetheresult)
+repartitioned2.foreachRDD(savetheresult)
 
+#get tweets with #bts
+filter2=lines.filter(lambda line: line if "#bts" in line.lower() else None)
+map2 = filter2.map( lambda line: ( 'bts', 1 ) )
+mapreduce2 = map2.reduceByKey( lambda a, b: a + b )
+#final=mapreduce2.map(lambda a: json.dumps(a))
+repartitioned2 = mapreduce2.repartition(1)
+repartitioned2.foreachRDD(savetheresult)
 
+'''
 
 
 #do the same thing for 2 more topics
