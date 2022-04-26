@@ -29,18 +29,6 @@ class TweetsListener(tweepy.Stream):
     def on_data(self, data):
         try:
             msg = json.loads( data )
-            #print(msg['text'].encode('utf-8'))
-            test_list=['#music','#ipl','#kgf','#bts','#elections']
-            topic=[ele for ele in test_list if(ele in msg['text'])]
-            if(len(topic)):
-                topic1=topic[0]
-            else:
-                return True
-            #val={"topic":topic1,"tweet":msg["text"]}
-            #jsonval=json.dumps(val)
-            #self.db.stream.insert_one(msg)
-            #producer.send(topic_name, msg['text'].encode('utf-8'))
-            #msg['text'].append(topic)      
             c_socket.send( msg['text'].encode('utf-8'))
             return True
         except BaseException as e:
@@ -55,8 +43,7 @@ class TweetsListener(tweepy.Stream):
 
 def send_tweets():
     stream_listener = TweetsListener(consumer_key, consumer_secret, access_token, access_secret)
-    stream_listener.filter(track=['#music','#ipl','#kgf','#bts','#elections'],languages=["en"])
-    #stream_listener.filter(track=['music'])
+    stream_listener.filter(track=['#ipl','#johnnydepp','#sports','#elonmusk','#covid'],languages=["en"])
 
 
 if __name__ == "__main__":
@@ -70,7 +57,6 @@ if __name__ == "__main__":
     s.listen(5)                 # Now wait for client connection.
     c, addr = s.accept()        # Establish connection with client.
     print("Received request from: " + str(addr))
-    #print(c)
     c_socket=c
     send_tweets()
 

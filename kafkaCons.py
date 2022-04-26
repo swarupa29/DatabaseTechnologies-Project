@@ -16,7 +16,7 @@ def insert_into_postgres(sql_string):
             host="localhost",
             password="root",
             port=5432,
-            # attempt to connect for 3 seconds then raise exception
+            # attempt to connect for 6 seconds then raise exception
             connect_timeout=6
 
         )
@@ -43,36 +43,12 @@ def insert_into_postgres(sql_string):
 
 consumer = kafka.KafkaConsumer(
     bootstrap_servers=['localhost:9092'],
-    auto_offset_reset='earliest',
+    auto_offset_reset='earliest', #if no commit, rollback to earlier offset
     enable_auto_commit=True,
-    group_id='my-group',
+    group_id='my-group', #group of conusmers
     value_deserializer=lambda x: loads(x.decode('utf-8')))
-consumer.subscribe(["music","ipl","kgf","bts","elections"])
-'''    
-consumer2 = kafka.KafkaConsumer(
-    'bts',
-    bootstrap_servers=['localhost:9092'],
-    auto_offset_reset='earliest',
-    enable_auto_commit=True,
-    group_id='my-group',
-    value_deserializer=lambda x: loads(x.decode('utf-8')))
-consumer3 = kafka.KafkaConsumer(
-    'kgf',
-    bootstrap_servers=['localhost:9092'],
-    auto_offset_reset='earliest',
-    enable_auto_commit=True,
-    group_id='my-group',
-    value_deserializer=lambda x: loads(x.decode('utf-8')))
-consumer4 = kafka.KafkaConsumer(
-    'elections',
-    bootstrap_servers=['localhost:9092'],
-    auto_offset_reset='earliest',
-    enable_auto_commit=True,
-    group_id='my-group',
-    value_deserializer=lambda x: loads(x.decode('utf-8')))
-
-'''
-
+#topics=["music","ipl","kgf","bts","nba"]
+consumer.subscribe(["covid","elonmusk","sports","johnnydepp","ipl"])
 
 
 
@@ -81,7 +57,6 @@ for message in consumer:
     message = message.value
     print(message)
     val=json.loads(message)
-    #data=[json.loads(line) for line in message]
     jsonobj = json.loads(val)
     # data ="{"topic":"music","count":"1"}"
     sql_string = 'INSERT INTO kafka_stream(topic_name,count) VALUES(\'' + \

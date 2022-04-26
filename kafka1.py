@@ -29,22 +29,7 @@ while True:
         print(val['topic'])
         topic=val['topic'].replace('#','')
         producer.send(topic, value=data)
-        
 
-
-
-    print("data len and data")
-    print(len(data))
-    if len(data) > 0:
-        print(data)
-
-
-'''
-for e in range(2):
-    data = {'number' : e}
-    producer.send('music', value=data)
-    sleep(5)k
-'''
 
 
 

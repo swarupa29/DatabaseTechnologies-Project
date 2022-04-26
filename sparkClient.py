@@ -13,7 +13,7 @@ from pyspark.sql.functions import desc
 def savetheresult( rdd ):
     if not rdd.isEmpty():
         print("in save")
-        res=rdd.toDF( [ "topic", "count" ] ).toJSON().first()
+        res=rdd.toDF( [ "topic", "count" ] ).toJSON().first() #{"topic":"music","count":1}
         print( res)
         send_kafka(res)
 
@@ -28,14 +28,13 @@ def send_kafka(res):
 
 sc = SparkContext()
 spark = SparkSession(sc)
-# we initiate the StreamingContext with 100 second batch interval. #next we initiate our sqlcontext
-ssc = StreamingContext(sc, 20)
+# we initiate the StreamingContext with 30 second batch interval.
+ssc = StreamingContext(sc, 30)
 
 socket_stream = ssc.socketTextStream("127.0.0.1", 5556)
-lines = socket_stream.window( 20 )
+lines = socket_stream.window( 30 )
 
-#ENTER THE LOGIC FOR GETTING COUNTS OF TWEETS HERE
-
+#socket to send to kafka
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)         # Create a socket object
 host = "127.0.0.1"     # Get local machine name
 port = 5558        # Reserve a port for your service.
@@ -45,7 +44,6 @@ print("Listening on port: %s" % str(port))
 s.listen(5)                 # Now wait for client connection.
 c, addr = s.accept()        # Establish connection with client.
 print("Received request from: " + str(addr))
-#print(c)
 c_socket=c
 
 
@@ -58,17 +56,16 @@ def get_tweets(lines,topic):
     filter1=lines.filter(lambda line: line if topic in line.lower() else None)
     map = filter1.map( lambda line: ( topic, 1)  )
     mapreduce = map.reduceByKey( lambda a, b: a + b )
-    #final1=mapreduce.map(lambda a: json.dumps(a))
     repartitioned = mapreduce.repartition(1)
     repartitioned.foreachRDD(savetheresult)
 
 
 
-get_tweets(lines,'#music')
+get_tweets(lines,'#covid')
+get_tweets(lines,'#elonmusk')
+get_tweets(lines,'#sports')
 get_tweets(lines,'#ipl')
-get_tweets(lines,'#bts')
-get_tweets(lines,'#elections')
-get_tweets(lines,'#kgf')
+get_tweets(lines,'#johnnydepp')
 
 
 
