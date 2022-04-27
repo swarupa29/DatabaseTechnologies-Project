@@ -41,24 +41,26 @@ def insert_into_postgres(sql_string):
         cur.close()
         conn.close()
 
+
+
+#kafka consumer 
 consumer = kafka.KafkaConsumer(
     bootstrap_servers=['localhost:9092'],
     auto_offset_reset='earliest', #if no commit, rollback to earlier offset
     enable_auto_commit=True,
     group_id='my-group', #group of conusmers
     value_deserializer=lambda x: loads(x.decode('utf-8')))
-#topics=["music","ipl","kgf","bts","nba"]
+#subscribe to topics
 consumer.subscribe(["covid","elonmusk","sports","johnnydepp","ipl"])
 
-
-
-print("here1")
 for message in consumer:
     message = message.value
     print(message)
     val=json.loads(message)
+    #load as dictionary
     jsonobj = json.loads(val)
     # data ="{"topic":"music","count":"1"}"
+    #create a sql command as string
     sql_string = 'INSERT INTO kafka_stream(topic_name,count) VALUES(\'' + \
         str(jsonobj['topic'])+'\','+str(jsonobj['count'])+');'
     insert_into_postgres(sql_string)
